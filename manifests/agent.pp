@@ -17,6 +17,8 @@
 #   ['environment']           - The environment of the puppet agent
 #   ['report']                - Whether to return reports
 #   ['pluginsync']            - Whethere to have pluginsync
+#   ['pluginsource']          - Where to obtain plugins e.g. puppet:///plugins
+#   ['pluginfactsource']      - Where to obtain plugin facts e.g. puppet:///plugins
 #   ['use_srv_records']       - Whethere to use srv records
 #   ['srv_domain']            - Domain to request the srv records
 #   ['ordering']              - The way the agent processes resources. New feature in puppet 3.3.0
@@ -56,6 +58,8 @@ class puppet::agent(
   $environment            = 'production',
   $report                 = true,
   $pluginsync             = true,
+  $pluginsource           = undef,  
+  $pluginfactsource       = undef,  
   $use_srv_records        = false,
   $srv_domain             = undef,
   $ordering               = undef,
@@ -277,6 +281,36 @@ class puppet::agent(
     setting => 'pluginsync',
     value   => $pluginsync,
   }
+  if $pluginsource != undef 
+  {  
+    ini_setting {'puppetpluginsource':
+      ensure  => present,
+      setting => 'pluginsource',
+      value   => $pluginsource,
+    }
+  }
+  else
+  {
+    ini_setting {'puppetpluginsource':
+      ensure  => absent,
+      setting => 'pluginsource',
+    }
+  } 
+  if $pluginfactsource != undef
+  {  
+    ini_setting {'puppetpluginfactsource':
+      ensure  => present,
+      setting => 'pluginfactsource',
+      value   => $pluginfactsource,
+    }    
+  }
+  else
+  {
+    ini_setting {'puppetpluginfactsource':
+      ensure  => absent,
+      setting => 'pluginfactsource',
+    }
+  }  
   ini_setting {'puppetagentlisten':
     ensure  => present,
     setting => 'listen',
