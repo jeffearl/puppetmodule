@@ -29,6 +29,7 @@
 #   ['templatedir']           - Template dir, if unset it will remove the setting.
 #   ['configtimeout']         - How long the client should wait for the configuration to be retrieved before considering it a failure
 #   ['stringify_facts']       - Wether puppet transforms structured facts in strings or no. Defaults to true in puppet < 4, deprecated in puppet >=4 (and will default to false)
+#   ['puppet_agent_ssldir']   - Agent ssl directory e.g. /var/lib/puppet/ssl
 #
 # Actions:
 # - Install and configures the puppet agent
@@ -70,6 +71,7 @@ class puppet::agent(
   $digest_algorithm       = $::puppet::params::digest_algorithm,
   $configtimeout          = '2m',
   $stringify_facts        = undef,
+  $puppet_agent_ssldir    = undef,
 ) inherits puppet::params {
 
   if ! defined(User[$::puppet::params::puppet_user]) {
@@ -353,6 +355,21 @@ class puppet::agent(
       ensure  => present,
       setting => 'stringify_facts',
       value   => $stringify_facts,
+    }
+  }
+  if $puppet_agent_ssldir != undef
+  {
+    ini_setting {'puppetagentssldir':
+      ensure  => present,
+      setting => 'ssldir',
+      value   => $puppet_agent_ssldir,
+    }
+  }
+  else
+  {
+    ini_setting {'puppetagentssldir':
+      ensure  => absent,
+      setting => 'ssldir',
     }
   }
 }
