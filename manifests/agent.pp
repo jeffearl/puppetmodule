@@ -197,21 +197,44 @@ class puppet::agent(
 
   if (($use_srv_records == true) and ($srv_domain == undef))
   {
+    ini_setting {'puppetagentmaster':
+      ensure  => present,
+      setting => 'server',
+      value   => $puppet_server,
+    }
     fail("${module_name} has attribute use_srv_records set but has srv_domain unset")
   }
   elsif (($use_srv_records == true) and ($srv_domain != undef))
   {
+    ini_setting {'puppetagentuse_srv_records':
+      ensure  => present,
+      setting => 'use_srv_records',
+      value   => $use_srv_records,
+    }
     ini_setting {'puppetagentsrv_domain':
       ensure  => present,
       setting => 'srv_domain',
       value   => $srv_domain,
     }
+    ini_setting {'puppetagentmaster':
+      ensure  => absent,
+      setting => 'server',
+    }
   }
   elsif($use_srv_records == false)
   {
+    ini_setting {'puppetagentuse_srv_records':
+      ensure  => absent,
+      setting => 'use_srv_records',
+    }
     ini_setting {'puppetagentsrv_domain':
       ensure  => absent,
       setting => 'srv_domain',
+    }
+    ini_setting {'puppetagentmaster':
+      ensure  => present,
+      setting => 'server',
+      value   => $puppet_server,
     }
   }
 
@@ -242,18 +265,6 @@ class puppet::agent(
     ensure  => present,
     setting => 'environment',
     value   => $environment,
-  }
-
-  ini_setting {'puppetagentmaster':
-    ensure  => present,
-    setting => 'server',
-    value   => $puppet_server,
-  }
-
-  ini_setting {'puppetagentuse_srv_records':
-    ensure  => present,
-    setting => 'use_srv_records',
-    value   => $use_srv_records,
   }
 
   ini_setting {'puppetagentruninterval':
